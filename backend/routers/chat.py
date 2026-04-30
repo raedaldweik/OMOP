@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from services import llm
 from services import audit_log
+from routers import cohort as cohort_router  # access _LAST so /api/cohort/last works after agent builds
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
@@ -26,6 +27,17 @@ class ChatRequest(BaseModel):
 def chat(req: ChatRequest) -> dict[str, Any]:
     history = [m.model_dump() for m in req.history]
     result = llm.run_agent(req.query, history=history)
+
+    # If the agent built a cohort during this turn, expose it to the
+    # download endpoint (/api/cohort/last/circe.json) and the
+    # /api/cohort/last lookup. Without this the Cohort Canvas's download
+    # button 404s because the agent's cohort lives in llm session state,
+    # not the cohort router's _LAST store.
+    if result.get("cohort"):
+        cohort_router._LAST["cohort"] = result["cohort"]
+        # llm.run_agent doesn't return person_ids; the canvas uses
+        # characterization.cohort_size for display so this can stay empty.
+        cohort_router._LAST["person_ids"] = []
 
     # Append to query log for the audit page
     audit_log.append({
