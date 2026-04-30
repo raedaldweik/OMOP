@@ -363,7 +363,7 @@ const styles = `
   --ink-lo: rgba(245,250,255,0.45);
   --ink-faint: rgba(245,250,255,0.28);
   --stage: 220px;
-  --logo: 130px;
+  --logo: 110px;
 
   position: fixed; inset: 0;
   width: 100%; height: 100vh;
