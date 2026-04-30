@@ -363,6 +363,7 @@ const styles = `
   --ink-lo: rgba(245,250,255,0.45);
   --ink-faint: rgba(245,250,255,0.28);
   --stage: 220px;
+  --logo: 130px;
 
   position: fixed; inset: 0;
   width: 100%; height: 100vh;
@@ -450,24 +451,54 @@ const styles = `
   flex-shrink: 0;
 }
 .health-landing .logo-stage::before {
-  content: ''; position: absolute; inset: -25px;
-  background: radial-gradient(circle, rgba(43,149,232,0.20) 0%, rgba(0,114,206,0.07) 35%, rgba(6,22,41,0) 70%);
-  z-index: 0;
+  content: '';
+  position: absolute; inset: -25px;
+  background: radial-gradient(circle, rgba(43,149,232,0.18) 0%, rgba(0,114,206,0.06) 35%, rgba(6,22,41,0) 70%);
+  z-index: 0; pointer-events: none;
   animation: hl-breathe 5s ease-in-out infinite;
 }
 @keyframes hl-breathe {
   0%,100% { opacity: 1; transform: scale(1); }
   50%     { opacity: 0.65; transform: scale(1.05); }
 }
-.health-landing .ring { position: absolute; border-radius: 50%; pointer-events: none; }
-.health-landing .ring-1 { inset: 0; border: 1px solid rgba(43,149,232,0.32); animation: hl-ringPulse 6s ease-in-out infinite; }
-.health-landing .ring-2 { inset: 20px; border: 1px solid rgba(43,149,232,0.20); animation: hl-ringPulse 6s ease-in-out infinite 1s; }
-.health-landing .ring-3 { inset: 40px; border: 1px solid rgba(43,149,232,0.12); animation: hl-ringPulse 6s ease-in-out infinite 2s; }
+/* Force-reset box model so Tailwind preflight doesn't bleed in */
+.health-landing .ring,
+.health-landing .ring-spin {
+  box-sizing: border-box;
+  background: transparent;
+  margin: 0; padding: 0;
+}
+
+/* Use box-shadow instead of borders — renders thinner & smoother
+   because the browser doesn't rasterize a 1px border on a curved edge,
+   it renders a sub-pixel inset shadow. Matches the HTML mock's airy feel. */
+.health-landing .ring {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  border: 0 !important;
+}
+.health-landing .ring-1 {
+  inset: 0;
+  box-shadow: inset 0 0 0 1px rgba(43,149,232,0.22);
+  animation: hl-ringPulse 6s ease-in-out infinite;
+}
+.health-landing .ring-2 {
+  inset: 24px;
+  box-shadow: inset 0 0 0 1px rgba(43,149,232,0.14);
+  animation: hl-ringPulse 6s ease-in-out infinite 1s;
+}
+.health-landing .ring-3 {
+  inset: 48px;
+  box-shadow: inset 0 0 0 1px rgba(43,149,232,0.08);
+  animation: hl-ringPulse 6s ease-in-out infinite 2s;
+}
 .health-landing .ring-spin {
   position: absolute; inset: -6px; border-radius: 50%;
-  border: 1px solid transparent;
-  border-top-color: rgba(43,149,232,0.55);
-  border-right-color: rgba(43,149,232,0.18);
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-top-color: rgba(43,149,232,0.42) !important;
+  border-right-color: rgba(43,149,232,0.12) !important;
+  border-bottom-color: transparent !important;
+  border-left-color: transparent !important;
   animation: hl-spin 18s linear infinite;
 }
 @keyframes hl-spin { to { transform: rotate(360deg); } }
@@ -477,7 +508,8 @@ const styles = `
 }
 .health-landing .logo-stage .logo-img {
   position: relative; z-index: 3;
-  width: 130px; height: 130px;
+  height: var(--logo); width: auto;
+  max-width: calc(var(--stage) - 20px);
   object-fit: contain;
   filter: drop-shadow(0 0 14px rgba(43,149,232,0.5)) drop-shadow(0 0 30px rgba(0,114,206,0.3));
 }
@@ -625,6 +657,6 @@ const styles = `
 @media (max-width: 1100px) {
   .health-landing .nav-tabs { display: none; }
   .health-landing .main { grid-template-columns: 1fr; padding: 0 24px 16px; gap: 18px; }
-  .health-landing .hero .logo-stage { width: 160px; height: 160px; }
+  .health-landing { --stage: 190px; --logo: 110px; }
 }
 `;
